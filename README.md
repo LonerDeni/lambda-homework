@@ -1,49 +1,45 @@
-# Задача 2: Работяга
+# Задача 1: Калькулятор
 
 ## Описание
-В данной задаче вам необходимо реализовать класс `Worker`, который будет выполнять некоторые задачи и возвращать результат в родительский класс `Main`.
+Создайте класс `Calculator`. В нем создайте статическую переменную типа `Supplier`. Это функциональный интерфейс, реализующий метод `get()`. С помощью данной переменной можно будет получить экземпляр класса `Calculator`. Реализуйте ссылку на вызов конструктора класса `Calculator() { }`.
 ```java
-public class Worker {
-
-}
+static Supplier<Calculator> instance = Calculator::new;
 ```
-Для того, чтобы класс `Worker` мог вернуть результат своей работы, реализуйте собственный функциональный интерфейс `OnTaskDoneListener`. В нем определите только один метод `onDone()` без реализации и пометьте интерфейс аннотацией `@FunctionalInterface`:
+Далее добавьте несколько переменных типа `BinaryOperator` для математических операций над двумя числами. Типизируйте их как `Integer`:
 ```java
-@FunctionalInterface
-public interface OnTaskDoneListener {
-    void onDone(String result);
-}
+BinaryOperator<Integer> plus = (x, y) -> x + y;
+BinaryOperator<Integer> minus = (x, y) -> x - y;
+BinaryOperator<Integer> multiply = (x, y) -> x * y;
+BinaryOperator<Integer> devide = (x, y) -> x / y;
 ```
-Добавьте в класс `Worker` переменную `callback` типа `OnTaskDoneListener`:
+Добавьте несколько переменных типа `UnaryOperator` для произведения математических операций над одним числом:
 ```java
-private OnTaskDoneListener callback;
+UnaryOperator<Integer> pow = x -> x * x;
+UnaryOperator<Integer> abs = x -> x > 0 ? x : x * -1;
 ```
-Передайте в класс `Worker` ее значение через конструктор:
+Добавьте переменную типа `Predicate` для определения положительное ли число:
 ```java
-public Worker(OnTaskDoneListener callback) {
-    this.callback = callback;
-}
+Predicate<Integer> isPositive = x -> x > 0;
 ```
-Смоделируйте выполнение классом `Worker` какой либо работы, например:
+Добавьте переменную типа `Consumer` для вывода числа в консоль. Используйте для этого ссылку на статический метод `println()`:
 ```java
-public void start() {
-    for (int i = 0; i < 100; i++) {
-        callback.onDone("Task " + i + " is done");
-    }
-}
+Consumer<Integer> println = System.out::println;
 ```
-Обратите внимание на то, что каждая итерация цикла означает выполнение задачи, результат который передается через метод `onDone()` функционального интерфейса `OnTaskDoneListener`.
 
 ## Реализация
-В классе `Main` в методе `main()` определите переменную `listener` типа `OnTaskDoneListener` через лямбда-выражение:
+В классе `Main` в методе `main()` создайте экземпляр класса `Calculator` через вызов статической переменной `instance`:
 ```java
-OnTaskDoneListener listener = System.out::println;
+Calculator calc = Calculator.instance.get();
 ```
-Далее создайте экземпляр класса `Worker` и передайте в конструктор класса `listener`:
+Произведите несколько математических операций над числами:
 ```java
-Worker worker = new Worker(listener);
-worker.start();
+int a = calc.plus.apply(1, 2);
+int b = calc.minus.apply(1,1);
+int c = calc.devide.apply(a, b);
 ```
-Обратите внимание на консоль. Все предполагаемые 100 задач были выполнены успешно. 
-
-Однако может случиться так, что выполнение одной из задач может закончиться неуспешно. Смоделируйте ситуацию, в которой 33 задача закончится неуспешно, и выведите информацию об этом в класс `Main`. Для этого создайте новый функциональный интерфейс `OnTaskErrorListener`, определите там метод `onError()`. Добавьте в класс `Worker` переменную `errorCallback` типа `OnTaskErrorListener`. Значение переменной передавайте так же через конструктор. Таким образом, в консоле после выполнения вашего кода все задачи, кроме 33, должны закончиться успешно, а 33 - оповестит об ошибке.
+И выведите в консоль результат:
+```java
+calc.println.accept(c);
+```
+Обратите внимание на то, что приведенный выше код работать не будет. С помощью комментария в коде объясните причину возникновения ошибки, в чем заключается ошибка и способы ее решения.
+(Подсказка: обратите внимание на реализацию тернарного оператора в переменной `abs`. Для решения проблемы можете реализовать аналог, либо сделать полноценный многострочный блок кода с { return }).
